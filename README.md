@@ -6,17 +6,15 @@ Copy `SuperHint.py` to IDA Pro plugins folder
 
 >**Tested version** : IDA pro 8.4
 
-# Usage
+# How to use
 Press `Shift`+`A` to enable the feature
 ![gif](superhint.gif)
-Click a variable or struct field in the pseudo-code and press `Shift`+`A` to add a hint comment.
-
-![png](superhint_json.png)
-When you close the database, all hint comments added to struct fields are automatically saved to JSON files.
+Click a variable or struct field in the pseudo-code and press `Shift`+`A` to add a hint comment.  
+>the hints will be stored in the  database file*
 
 # Features
 - Supports Local variable and structure fields
 
-
 # Future updates
 - Supporting global variables and functions
+- export/import structure hint database
