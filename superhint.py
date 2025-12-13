@@ -73,11 +73,26 @@ class HintManager(ida_hexrays.Hexrays_Hooks):
         self.hint_storage  = hint_storage()
 
     def create_hint(self, vu):
+        hint = ""
+        viewer = ida_kernwin.get_current_widget()
+        if ida_kernwin.get_widget_type(viewer) != ida_kernwin.BWN_PSEUDOCODE:
+            print("[!] Not in pesudocode")
+            return
+
 
         if vu.get_current_item(idaapi.USE_KEYBOARD):
-                item = vu.item.it
+            item = vu.item.it
         else:
-            return
+            return 0
+        
+
+        if(vu.item.get_lvar()):
+            lvar = vu.item.get_lvar()
+            if(lvar):
+                hint = lvar.cmt
+            else:
+                return 0
+            
 
         if(item.is_expr()):
             item_expr = item.cexpr
@@ -103,13 +118,6 @@ class HintManager(ida_hexrays.Hexrays_Hooks):
                     
                     hint = target_struct[member_offset]
 
-            elif(item_expr.op == idaapi.cot_var):
-                lvar = vu.item.get_lvar()
-                if(lvar):
-                    hint = lvar.cmt
-                else:
-                    return 0
-
             elif(item_expr.op == idaapi.cot_obj):
                 target_global_func = self.hint_storage.get_globalvar_func_db(str(item_expr.obj_ea))
                 if(target_global_func == 0):
@@ -123,7 +131,7 @@ class HintManager(ida_hexrays.Hexrays_Hooks):
             if(hint == ""):
                 return 0
 
-            return 5, hint + "\n\n", 1000
+        return 5, hint + "\n\n", 1000
         
 
     def edit_hint(self, cmt):
