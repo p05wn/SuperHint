@@ -2,8 +2,10 @@
 IDA plugin that allows users to add comments to variable hints
 
 # Installation
+**Please install from GitHub Releases instead of using hcli.**
 Copy `SuperHint.py` to IDA Pro plugins folder
-> installing with hcli will install the old version that might not run properly
+
+
 # How to use
 ![gif](superhint.gif)
 1. Press `Shift`+`A` to enable the feature
