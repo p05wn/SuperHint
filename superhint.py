@@ -9,9 +9,9 @@ import ida_typeinf
 
 NODE_NAME = "$ SuperHint"
 
-
-class hint_storage():
+class hint_storage(idaapi.IDB_Hooks):
     def __init__(self):
+        idaapi.IDB_Hooks.__init__(self)
         self.node = ida_netnode.netnode(NODE_NAME, 0, False)
         if self.node == idaapi.BADNODE:
             print("[+] create new")
@@ -31,6 +31,35 @@ class hint_storage():
         
         print(self.struct_db)
         print(self.global_func_db)
+
+
+    def savebase(self):
+        self.update_struct_db()
+
+
+    def update_struct_db(self):
+        print("")
+        for key in self.struct_db.keys():
+            target_ti = idaapi.get_idati()
+            struct_name = ida_typeinf.get_numbered_type_name(target_ti, int(key))
+
+            if struct_name == "" or struct_name == None:
+                ordinal = ida_typeinf.get_type_ordinal(None, self.struct_db[key]["name"])
+
+                if(ordinal == None or ordinal == 0):
+                    self.struct_db.pop(key)
+                else:
+                    self.struct_db[str(ordinal)] = self.struct_db.pop(key)
+
+                return 
+            
+            if(struct_name != self.struct_db[key]["name"]):
+                print(f"[+] fuck struct name has been changed : {struct_name}")
+                self.struct_db[key]["name"] = struct_name
+                print(self.struct_db)
+            
+
+
 
 
     def store_hint_storage(self):
@@ -54,7 +83,9 @@ class hint_storage():
 
     def new_struct_hint(self, ordinal):
         if ordinal not in self.struct_db:
+            target_ti = idaapi.get_idati()
             self.struct_db[ordinal] = {}
+            self.struct_db[ordinal]["name"] = ida_typeinf.get_numbered_type_name(target_ti, int(ordinal))
 
         return self.struct_db[ordinal]
 
@@ -64,13 +95,15 @@ class hint_storage():
         
         return self.global_func_db
 
-    
+
+
 
 
 class HintManager(ida_hexrays.Hexrays_Hooks):
     def __init__(self):
         super(HintManager, self).__init__()
         self.hint_storage  = hint_storage()
+        self.hint_storage.hook()
 
     def create_hint(self, vu):
         hint = ""
@@ -210,6 +243,7 @@ class MyPlugmod(ida_idaapi.plugmod_t):
 
     def __del__(self):
         self.osw_hint_manager.hint_storage.store_hint_storage()
+        self.osw_hint_manager.hint_storage.unhook()
         self.remove_hint_hook()
         
 
@@ -257,3 +291,13 @@ class MyPlugin(ida_idaapi.plugin_t):
 
 def PLUGIN_ENTRY():
     return MyPlugin()
+
+
+"""
+구조체와 전역변수는 생성할때 이름 필드도 따로 저장한다.
+
+저장 시
+
+
+
+"""

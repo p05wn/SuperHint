@@ -4,7 +4,7 @@
     "name": "SuperHint",
     "version": "1.2.0",
     "entryPoint": "superhint.py",
-    "description": "add/edit comments to hints. Supports local variable and structure fields",
+    "description": "add/edit comments to hints.",
     "urls": {
       "repository": "https://github.com/p05wn/SuperHint"
     },
